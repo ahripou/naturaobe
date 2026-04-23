@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Naturao — Terroir chaleureux</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #efe8d6; }
+  body { font-family: Inter, sans-serif; color: #2c2a1e; }
+  * { box-sizing: border-box; }
+  button { font: inherit; color: inherit; }
+  a { color: inherit; text-decoration: none; }
+</style>
+
+<script>
+window.TWEAKS = /*EDITMODE-BEGIN*/{
+  "display_font": "Fraunces",
+  "bg": "#e9e0c8",
+  "sage": "#3e4a30",
+  "terre": "#a04a2d",
+  "density": "Dense"
+}/*EDITMODE-END*/;
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="dir-c.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+(() => {
+  // Apply tweaks globally via mutating PALETTE_C + font var
+  function applyTweaks(t) {
+    if (!window.PALETTE_C) return;
+    window.PALETTE_C.bg = t.bg;
+    window.PALETTE_C.bgTop = t.bg;
+    window.PALETTE_C.sage = t.sage;
+    window.PALETTE_C.terre = t.terre;
+    // body bg
+    document.body.style.background = t.bg;
+    // font override
+    const style = document.getElementById("tweak-font") || (() => {
+      const s = document.createElement("style"); s.id = "tweak-font"; document.head.appendChild(s); return s;
+    })();
+    style.textContent = `
+      [data-naturao-root] h1, [data-naturao-root] h2, [data-naturao-root] h3, [data-naturao-root] h4 {
+        font-family: "${t.display_font}", serif !important;
+      }
+      [data-naturao-root] [data-display] { font-family: "${t.display_font}", serif !important; }
+    `;
+  }
+
+  function NaturaoApp() {
+    const [page, setPage] = React.useState(() => localStorage.getItem("naturao_page") || "accueil");
+    const [lang, setLang] = React.useState(() => localStorage.getItem("naturao_lang") || "FR");
+    const [producer, setProducer] = React.useState(null);
+    const [tweaks, setTweaks] = React.useState(window.TWEAKS);
+    const [editMode, setEditMode] = React.useState(false);
+
+    React.useEffect(() => { localStorage.setItem("naturao_page", page); }, [page]);
+    React.useEffect(() => { localStorage.setItem("naturao_lang", lang); }, [lang]);
+    React.useEffect(() => { applyTweaks(tweaks); }, [tweaks]);
+
+    // Edit-mode protocol — listener first, then announce availability
+    React.useEffect(() => {
+      const onMsg = (e) => {
+        if (!e.data || typeof e.data !== "object") return;
+        if (e.data.type === "__activate_edit_mode") setEditMode(true);
+        if (e.data.type === "__deactivate_edit_mode") setEditMode(false);
+      };
+      window.addEventListener("message", onMsg);
+      window.parent.postMessage({ type: "__edit_mode_available" }, "*");
+      return () => window.removeEventListener("message", onMsg);
+    }, []);
+
+    const nav = (p, prod) => {
+      if (prod) setProducer(prod);
+      setPage(p);
+      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+    };
+
+    const updateTweak = (patch) => {
+      const next = { ...tweaks, ...patch };
+      setTweaks(next);
+      window.parent.postMessage({ type: "__edit_mode_set_keys", edits: patch }, "*");
+    };
+
+    const shared = { nav, lang, setLang };
+    let PageEl;
+    if (page === "fiche") PageEl = <DirC_Fiche {...shared} producer={producer || window.NATURAO_FEATURED_PRODUCER} />;
+    else if (page === "producteurs") PageEl = <DirC_Producteurs {...shared} />;
+    else PageEl = <DirC_Accueil {...shared} />;
+
+    return (
+      <div data-naturao-root>
+        {PageEl}
+        {editMode && <TweaksPanel tweaks={tweaks} update={updateTweak} />}
+      </div>
+    );
+  }
+
+  function TweaksPanel({ tweaks, update }) {
+    const fonts = ["Cormorant Garamond", "Fraunces"];
+    const densities = ["Confortable", "Dense"];
+    const palettes = [
+      { label: "Crème · Olive · Bois", bg: "#efe8d6", sage: "#6b7340", terre: "#8a5a2b" },
+      { label: "Ivoire · Sauge · Terre", bg: "#f3ede0", sage: "#58634c", terre: "#a05a3a" },
+      { label: "Lin · Mousse · Cuivre", bg: "#ece4ce", sage: "#4f5e3a", terre: "#9a5c2d" },
+      { label: "Sable · Vert foncé · Brique", bg: "#e9e0c8", sage: "#3e4a30", terre: "#a04a2d" },
+    ];
+
+    return (
+      <div style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        width: 320,
+        background: "#fff",
+        color: "#2c2a1e",
+        border: "1px solid #d6c9a7",
+        borderRadius: 6,
+        padding: 20,
+        fontFamily: "Inter, sans-serif",
+        fontSize: 12,
+        boxShadow: "0 30px 60px -20px rgba(0,0,0,0.25)",
+        zIndex: 100,
+      }}>
+        <div style={{
+          fontFamily: '"Cormorant Garamond", serif',
+          fontSize: 22,
+          marginBottom: 4,
+          fontStyle: "italic",
+        }}>Tweaks</div>
+        <div style={{ fontSize: 11, color: "#7a7258", marginBottom: 20, letterSpacing: "0.04em" }}>
+          Ajuste le design en direct
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#7a7258", marginBottom: 10 }}>Palette</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {palettes.map((p) => {
+              const active = p.bg === tweaks.bg && p.sage === tweaks.sage && p.terre === tweaks.terre;
+              return (
+                <button key={p.label} onClick={() => update({ bg: p.bg, sage: p.sage, terre: p.terre })} style={{
+                  border: active ? "2px solid #2c2a1e" : "1px solid #e6e1cf",
+                  background: "#fff",
+                  padding: 8,
+                  cursor: "pointer",
+                  textAlign: "left",
+                  borderRadius: 4,
+                }}>
+                  <div style={{ display: "flex", gap: 3, marginBottom: 6 }}>
+                    <div style={{ width: "100%", height: 18, background: p.bg, borderRadius: 2 }}></div>
+                    <div style={{ width: "100%", height: 18, background: p.sage, borderRadius: 2 }}></div>
+                    <div style={{ width: "100%", height: 18, background: p.terre, borderRadius: 2 }}></div>
+                  </div>
+                  <div style={{ fontSize: 10, lineHeight: 1.3, color: "#2c2a1e" }}>{p.label}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#7a7258", marginBottom: 10 }}>Typographie</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {fonts.map((f) => (
+              <button key={f} onClick={() => update({ display_font: f })} style={{
+                flex: 1,
+                padding: "8px 10px",
+                background: tweaks.display_font === f ? "#2c2a1e" : "#fff",
+                color: tweaks.display_font === f ? "#efe8d6" : "#2c2a1e",
+                border: "1px solid #d6c9a7",
+                borderRadius: 4,
+                cursor: "pointer",
+                fontFamily: `"${f}", serif`,
+                fontSize: 14,
+                fontStyle: "italic",
+              }}>{f.split(" ")[0]}</button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "#7a7258", marginBottom: 10 }}>Densité</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {densities.map((d) => (
+              <button key={d} onClick={() => update({ density: d })} style={{
+                flex: 1,
+                padding: "8px 10px",
+                background: tweaks.density === d ? "#2c2a1e" : "#fff",
+                color: tweaks.density === d ? "#efe8d6" : "#2c2a1e",
+                border: "1px solid #d6c9a7",
+                borderRadius: 4,
+                cursor: "pointer",
+                fontSize: 12,
+              }}>{d}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  applyTweaks(window.TWEAKS);
+  ReactDOM.createRoot(document.getElementById("root")).render(<NaturaoApp />);
+})();
+</script>
+
+</body>
+</html>
