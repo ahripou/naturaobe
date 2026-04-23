@@ -6,7 +6,7 @@ import { useState } from 'react'
 const COLS = [
   { title: 'Navigation', links: [{ label: 'Accueil', href: '/' }, { label: 'Producteurs', href: '/producteurs' }, { label: 'Produits', href: '/produits' }, { label: 'À propos', href: '/a-propos' }] },
   { title: 'Contact', links: [{ label: 'hello@naturao.be', href: 'mailto:hello@naturao.be' }, { label: 'Bruxelles, Belgique', href: '#' }, { label: 'Mentions légales', href: '/mentions-legales' }] },
-  { title: 'Suivre', links: [{ label: 'Instagram', href: '#' }, { label: 'LinkedIn', href: '#' }, { label: 'Newsletter', href: '#newsletter' }] },
+  { title: 'Suivre', links: [{ label: 'Instagram', href: 'https://instagram.com' }, { label: 'Newsletter', href: '#newsletter' }] },
 ]
 
 export default function Footer() {
