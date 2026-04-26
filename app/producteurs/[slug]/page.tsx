@@ -168,6 +168,7 @@ export default function FicheProducteur({ params }: Props) {
       </section>
 
       {/* ── Produits associés ────────────────────────────────── */}
+      {p.produitsAssocies.length > 0 && (
       <section className="section section-alt">
         <div className="container">
           <FadeIn>
@@ -202,6 +203,7 @@ export default function FicheProducteur({ params }: Props) {
           </div>
         </div>
       </section>
+      )}
 
       <Footer />
     </>

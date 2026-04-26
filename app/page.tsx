@@ -4,9 +4,17 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Marquee from '@/components/Marquee'
 import FadeIn from '@/components/FadeIn'
-import PRODUCERS, { CATALOGUE_ITEMS } from '@/data/producers'
+import PRODUCERS from '@/data/producers'
 
 const featured = PRODUCERS.slice(0, 3)
+
+const CATALOGUE_ITEMS = PRODUCERS.slice(0, 8).map((p) => ({
+  image: p.image,
+  nom: p.specialite.split(',')[0].trim(),
+  cat: p.pays,
+  prod: p.nom,
+  saison: false,
+}))
 
 const INSTAGRAM = [
   'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&q=80',

@@ -32,7 +32,7 @@ export default function Produits() {
         <div className="container">
           <FadeIn>
             <div className="eyebrow" style={{ marginBottom: 24 }}>
-              {ALL_PRODUCTS.length} produits · 12 maisons
+              {ALL_PRODUCTS.length} produits · {PRODUCERS.length} maisons
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 64, alignItems: 'flex-end' }}>
               <h1 className="display-xxl">

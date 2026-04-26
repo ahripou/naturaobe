@@ -19,7 +19,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Naturao — Maison de producteurs',
-  description: 'Des producteurs engagés, sélectionnés pour leur qualité. Belgique, France, Italie, Portugal.',
+  description: 'Des producteurs engagés, sélectionnés pour leur qualité. Belgique, France, Italie.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

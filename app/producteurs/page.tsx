@@ -8,8 +8,8 @@ import Footer from '@/components/Footer'
 import FadeIn from '@/components/FadeIn'
 import PRODUCERS from '@/data/producers'
 
-const SPECIALTIES = ['Tous', 'Maraîchage', 'Vins', 'Fromages', 'Huile', 'Miel', 'Pain', 'Charcuterie', 'Bières', 'Chocolat']
-const COUNTRIES = ['Tous', 'Belgique', 'France', 'Italie', 'Portugal']
+const SPECIALTIES = ['Tous', 'Vin', 'Bière', 'Boisson', 'Miel', 'Chocolat', 'Fromage', 'Pâtes', 'Légumineuse', 'Conserve', 'Biscuit', 'Chips', 'Bonbon', 'Sirop', 'Saumon', 'Micropousse']
+const COUNTRIES = ['Tous', 'Belgique', 'France', 'Italie']
 
 export default function Producteurs() {
   const [specialty, setSpecialty] = useState('Tous')
@@ -29,7 +29,7 @@ export default function Producteurs() {
         <div className="container">
           <FadeIn>
             <div className="eyebrow" style={{ marginBottom: 24 }}>
-              {PRODUCERS.length} maisons · Belgique, France, Italie, Portugal
+              {PRODUCERS.length} maisons · Belgique, France, Italie
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 64, alignItems: 'flex-end' }}>
               <h1 className="display-xxl">
