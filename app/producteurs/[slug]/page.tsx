@@ -5,15 +5,17 @@ import type { Metadata } from 'next'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import FadeIn from '@/components/FadeIn'
-import PRODUCERS from '@/data/producers'
+import { getProducers } from '@/lib/getProducers'
 
 type Props = { params: { slug: string } }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const PRODUCERS = await getProducers()
   return PRODUCERS.map((p) => ({ slug: p.slug }))
 }
 
-export function generateMetadata({ params }: Props): Metadata {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const PRODUCERS = await getProducers()
   const p = PRODUCERS.find((p) => p.slug === params.slug)
   if (!p) return {}
   return {
@@ -22,7 +24,8 @@ export function generateMetadata({ params }: Props): Metadata {
   }
 }
 
-export default function FicheProducteur({ params }: Props) {
+export default async function FicheProducteur({ params }: Props) {
+  const PRODUCERS = await getProducers()
   const p = PRODUCERS.find((p) => p.slug === params.slug)
   if (!p) notFound()
 

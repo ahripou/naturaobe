@@ -4,19 +4,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Marquee from '@/components/Marquee'
 import FadeIn from '@/components/FadeIn'
-import PRODUCERS from '@/data/producers'
-
-const featured = PRODUCERS.slice(0, 3)
-
-const CATALOGUE_ITEMS = PRODUCERS.flatMap((p) =>
-  p.produitsAssocies.slice(0, 1).map((pr) => ({
-    image: pr.image,
-    nom: pr.nom,
-    cat: pr.categorie,
-    prod: p.nom,
-    saison: false,
-  }))
-).slice(0, 8)
+import { getProducers } from '@/lib/getProducers'
 
 const INSTAGRAM = [
   'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&q=80',
@@ -27,7 +15,19 @@ const INSTAGRAM = [
   'https://images.unsplash.com/photo-1511381939415-e44015466834?w=400&q=80',
 ]
 
-export default function Accueil() {
+export default async function Accueil() {
+  const PRODUCERS = await getProducers()
+  const featured = PRODUCERS.slice(0, 3)
+  const CATALOGUE_ITEMS = PRODUCERS.flatMap((p) =>
+    p.produitsAssocies.slice(0, 1).map((pr) => ({
+      image: pr.image,
+      nom: pr.nom,
+      cat: pr.categorie,
+      prod: p.nom,
+      saison: false,
+    }))
+  ).slice(0, 8)
+
   return (
     <>
       <Header />
