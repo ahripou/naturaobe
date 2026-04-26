@@ -196,6 +196,11 @@ export default function FicheProducteur({ params }: Props) {
                   <div className="product-card-body">
                     <div className="product-card-cat">{pr.categorie}</div>
                     <h3 className="product-card-name">{pr.nom}</h3>
+                    {pr.prix && (
+                      <div style={{ marginTop: 8, fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--terre)' }}>
+                        {pr.prix} € <span style={{ fontSize: 12, color: 'var(--muted)' }}>/ {pr.offre}</span>
+                      </div>
+                    )}
                   </div>
                 </article>
               </FadeIn>

@@ -8,13 +8,15 @@ import PRODUCERS from '@/data/producers'
 
 const featured = PRODUCERS.slice(0, 3)
 
-const CATALOGUE_ITEMS = PRODUCERS.slice(0, 8).map((p) => ({
-  image: p.image,
-  nom: p.specialite.split(',')[0].trim(),
-  cat: p.pays,
-  prod: p.nom,
-  saison: false,
-}))
+const CATALOGUE_ITEMS = PRODUCERS.flatMap((p) =>
+  p.produitsAssocies.slice(0, 1).map((pr) => ({
+    image: pr.image,
+    nom: pr.nom,
+    cat: pr.categorie,
+    prod: p.nom,
+    saison: false,
+  }))
+).slice(0, 8)
 
 const INSTAGRAM = [
   'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&q=80',

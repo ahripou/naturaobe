@@ -12,7 +12,7 @@ const ALL_PRODUCTS = PRODUCERS.flatMap((p) =>
   p.produitsAssocies.map((pr) => ({ ...pr, producteur: p.nom, slug: p.slug }))
 )
 
-const CATEGORIES = ['Tous', 'Légumes', 'Fruits', 'Vins', 'Fromages', 'Crémerie', 'Épicerie', 'Boulangerie', 'Viennoiserie', 'Charcuterie', 'Conserves', 'Bières', 'Chocolat', 'Épices', 'Boissons', 'Aromates', 'Bien-être']
+const CATEGORIES = ['Tous', ...Array.from(new Set(ALL_PRODUCTS.map((p) => p.categorie))).sort()]
 
 export default function Produits() {
   const [cat, setCat] = useState('Tous')
@@ -100,6 +100,11 @@ export default function Produits() {
                         <div className="product-card-cat">{pr.categorie}</div>
                         <h2 className="product-card-name">{pr.nom}</h2>
                         <div className="product-card-prod">par {pr.producteur}</div>
+                        {pr.prix && (
+                          <div style={{ marginTop: 8, fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--terre)' }}>
+                            {pr.prix} € <span style={{ fontSize: 12, color: 'var(--muted)' }}>/ {pr.offre}</span>
+                          </div>
+                        )}
                       </div>
                     </article>
                   </Link>
