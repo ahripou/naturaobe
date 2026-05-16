@@ -5,14 +5,9 @@ function slugify(s: string) {
   return s
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-}
-
-function formatPrice(n: number | null) {
-  if (n == null) return ''
-  return n.toFixed(2).replace('.', ',')
 }
 
 const PLACEHOLDER =
@@ -26,18 +21,15 @@ export async function getProducers(): Promise<Producer[]> {
   const [{ data: producers, error: e1 }, { data: products, error: e2 }] = await Promise.all([
     supabase
       .from('producers')
-      .select(
-        'id,code,name,slug,description_fr,address,phone,email,website,vat_number,logo_url,cover_url,region,country,is_bio,certifications,franco_minimum,delivery_terms,payment_terms,notes'
-      )
-      .eq('is_active', true)
+      .select('code,name,region,country,website')
       .order('name'),
     supabase
       .from('catalog_products')
       .select(
-        'id,sku_hub,producer_id,name_fr,description_fr,offer,price_ttc,vat_rate,available,image_url,category'
+        'sku_naturao,producer_code,name_fr,short_desc_fr,long_desc_fr,category,image_path'
       )
-      .eq('is_active', true)
-      .order('sku_hub'),
+      .is('deleted_at', null)
+      .order('sku_naturao'),
   ])
 
   if (e1 || e2) {
@@ -47,52 +39,49 @@ export async function getProducers(): Promise<Producer[]> {
 
   const productsByProducer = new Map<string, Product[]>()
   for (const p of products ?? []) {
-    const arr = productsByProducer.get(p.producer_id) ?? []
+    const arr = productsByProducer.get(p.producer_code) ?? []
     arr.push({
-      sku: p.sku_hub,
-      slug: slugify(p.name_fr ?? p.sku_hub),
+      sku: p.sku_naturao,
+      slug: slugify(p.name_fr ?? p.sku_naturao),
       nom: p.name_fr ?? '',
       categorie: p.category ?? '',
-      description: p.description_fr ?? '',
-      offre: p.offer ?? '',
-      prix: formatPrice(p.price_ttc),
-      tva: p.vat_rate != null ? `${p.vat_rate}%` : '',
-      enStock: !!p.available,
-      image: p.image_url ?? PLACEHOLDER,
+      description: p.long_desc_fr ?? p.short_desc_fr ?? '',
+      offre: '',
+      prix: '',
+      tva: '',
+      enStock: true,
+      image: p.image_path || PLACEHOLDER,
       saison: false,
     })
-    productsByProducer.set(p.producer_id, arr)
+    productsByProducer.set(p.producer_code, arr)
   }
 
   const result: Producer[] = (producers ?? []).map((pr, idx) => {
-    const prods = productsByProducer.get(pr.id) ?? []
+    const prods = productsByProducer.get(pr.code) ?? []
     const cats = Array.from(new Set(prods.map((p) => p.categorie).filter(Boolean)))
     const galerie = prods
-      .filter((p) => p.image)
-      .slice(0, 4)
       .map((p) => p.image)
-    while (galerie.length < 4) galerie.push(pr.cover_url ?? pr.logo_url ?? PLACEHOLDER)
+      .filter(Boolean)
+      .slice(0, 4)
+    while (galerie.length < 4) galerie.push(PLACEHOLDER)
 
-    const histoire = pr.description_fr ?? ''
-    const accroche = histoire.split(/(?<=[.!?])\s+/)[0] ?? ''
-    const methode = (pr.certifications ?? []).slice(0, 3) as string[]
-    while (methode.length < 3) methode.push('Savoir-faire artisanal')
+    const hero = prods.find((p) => p.image && p.image !== PLACEHOLDER)?.image ?? PLACEHOLDER
 
     return {
       id: idx + 1,
-      slug: pr.slug,
+      slug: slugify(pr.name),
       code: pr.code,
       nom: pr.name,
       pays: pr.country ?? '',
       region: pr.region ?? '',
       specialite: cats[0] ?? '',
-      accroche,
-      image: pr.cover_url ?? pr.logo_url ?? PLACEHOLDER,
-      logo: pr.logo_url ?? PLACEHOLDER,
+      accroche: '',
+      image: hero,
+      logo: PLACEHOLDER,
       site: pr.website ?? '',
-      histoire,
-      engagement: pr.franco_minimum ?? '',
-      methode: [methode[0], methode[1], methode[2]] as [string, string, string],
+      histoire: '',
+      engagement: '',
+      methode: ['Savoir-faire artisanal', 'Production locale', 'Sélection rigoureuse'] as [string, string, string],
       galerie: [galerie[0], galerie[1], galerie[2], galerie[3]] as [string, string, string, string],
       produitsAssocies: prods,
     }
