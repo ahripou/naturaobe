@@ -10,8 +10,17 @@ function slugify(s: string) {
     .replace(/(^-|-$)/g, '')
 }
 
+const PRODUCT_IMG_BASE =
+  'https://vedopibxnomcafbqgnqk.supabase.co/storage/v1/object/public/product-images/'
+
 const PLACEHOLDER =
   'https://vedopibxnomcafbqgnqk.supabase.co/storage/v1/object/public/producer-images/placeholder.webp'
+
+function resolveImage(path: string | null | undefined): string {
+  if (!path) return PLACEHOLDER
+  if (/^https?:\/\//i.test(path)) return path
+  return PRODUCT_IMG_BASE + path.replace(/^\/+/, '')
+}
 
 let cache: Producer[] | null = null
 
@@ -50,7 +59,7 @@ export async function getProducers(): Promise<Producer[]> {
       prix: '',
       tva: '',
       enStock: true,
-      image: p.image_path || PLACEHOLDER,
+      image: resolveImage(p.image_path),
       saison: false,
     })
     productsByProducer.set(p.producer_code, arr)
