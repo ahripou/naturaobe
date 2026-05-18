@@ -2,7 +2,7 @@
 
 ## Data quality (Supabase, no code changes)
 
-- [ ] Fill `producers.region` for the 14 producers currently missing it.
+- [ ] Fill `producers.region` for the 13 producers still missing it: 12 Belgian (ASG, BHV, BKB, BLP, CDL, CDA, DBG, DZJ, KEV, LKS, MNT, RIT) + Convivia/CVV (Italy). Set on 2026-05-18: BRF=Alsace, KBR=Bretagne, DML=Lot-et-Garonne.
 - [ ] Decide a canonical form for `image_path` (full URL vs filename) and normalize once.
 - [ ] Backfill 8 rows where `image_path` is still bare filename: `HUB-ASG-002`, `HUB-ASG-003`, `HUB-BKB-001`, `HUB-CDL-010`, `HUB-KBR-012`, `HUB-KBR-013`, `HUB-KBR-014`, `HUB-RIT-009`.
 
