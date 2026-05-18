@@ -1,5 +1,12 @@
 import { supabase } from './supabase'
+import { getAllProducerContent } from './getProducerContent'
 import type { Producer, Product } from '@/data/types'
+
+const FALLBACK_METHODE: [string, string, string] = [
+  'Savoir-faire artisanal',
+  'Production locale',
+  'Sélection rigoureuse',
+]
 
 function slugify(s: string) {
   return s
@@ -65,6 +72,8 @@ export async function getProducers(): Promise<Producer[]> {
     productsByProducer.set(p.producer_code, arr)
   }
 
+  const contentByCode = getAllProducerContent()
+
   const result: Producer[] = (producers ?? []).map((pr, idx) => {
     const prods = productsByProducer.get(pr.code) ?? []
     const cats = Array.from(new Set(prods.map((p) => p.categorie).filter(Boolean)))
@@ -76,6 +85,14 @@ export async function getProducers(): Promise<Producer[]> {
 
     const hero = prods.find((p) => p.image && p.image !== PLACEHOLDER)?.image ?? PLACEHOLDER
 
+    const content = contentByCode.get(pr.code) ?? {}
+    const m = content.methode ?? []
+    const methode: [string, string, string] = [
+      m[0] ?? FALLBACK_METHODE[0],
+      m[1] ?? FALLBACK_METHODE[1],
+      m[2] ?? FALLBACK_METHODE[2],
+    ]
+
     return {
       id: idx + 1,
       slug: slugify(pr.name),
@@ -84,13 +101,13 @@ export async function getProducers(): Promise<Producer[]> {
       pays: pr.country ?? '',
       region: pr.region ?? '',
       specialite: cats[0] ?? '',
-      accroche: '',
+      accroche: content.accroche ?? '',
       image: hero,
       logo: PLACEHOLDER,
       site: pr.website ?? '',
-      histoire: '',
-      engagement: '',
-      methode: ['Savoir-faire artisanal', 'Production locale', 'Sélection rigoureuse'] as [string, string, string],
+      histoire: content.histoire ?? '',
+      engagement: content.engagement ?? '',
+      methode,
       galerie: [galerie[0], galerie[1], galerie[2], galerie[3]] as [string, string, string, string],
       produitsAssocies: prods,
     }

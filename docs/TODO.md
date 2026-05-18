@@ -8,9 +8,10 @@
 
 ## Producer pages
 
-- [ ] Source real `histoire` / `engagement` / `accroche` per producer. Either add columns back to `producers` or store as Markdown files keyed by producer code.
+- [x] Infrastructure for per-producer copy: Markdown files at `content/producers/<CODE>.md`. See `content/producers/README.md`. Sample: `BPH.md`.
+- [ ] Write `content/producers/<CODE>.md` for the remaining 23 producers: ASG, BHV, BKB, BLP, BRF, CDA, CDL, CVV, DBG, DML, DZJ, ECO, FBR, IMP, KBR, KEV, LAX, LKS, MNT, RIT, SAA, TDB, TDF. Each file needs `accroche`, `engagement`, three `methode` items, and a body for `histoire`.
 - [ ] Add proper producer photos (`producers.cover_url`, `logo_url`) — currently we reuse the first product image as the hero, which is visually weak.
-- [ ] Replace the three hardcoded `methode` strings with real ones.
+- [ ] Per-producer `methode` already supported via the Markdown frontmatter — missing files fall back to the three generic strings in `lib/getProducers.ts`.
 
 ## Site
 

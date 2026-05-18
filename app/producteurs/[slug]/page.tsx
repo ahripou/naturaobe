@@ -101,12 +101,24 @@ export default async function FicheProducteur({ params }: Props) {
               <div className="eyebrow">L'histoire</div>
             </FadeIn>
             <FadeIn delay={100}>
-              <p style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(18px, 2vw, 26px)', lineHeight: 1.5 }}>
-                {p.histoire}
-              </p>
-              <p style={{ marginTop: 28, fontSize: 16, lineHeight: 1.7, color: 'var(--muted)' }}>
-                {p.engagement}
-              </p>
+              {p.histoire.split(/\n{2,}/).map((para, i) => (
+                <p
+                  key={i}
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'clamp(18px, 2vw, 26px)',
+                    lineHeight: 1.5,
+                    marginTop: i === 0 ? 0 : 20,
+                  }}
+                >
+                  {para}
+                </p>
+              ))}
+              {p.engagement && (
+                <p style={{ marginTop: 28, fontSize: 16, lineHeight: 1.7, color: 'var(--muted)' }}>
+                  {p.engagement}
+                </p>
+              )}
             </FadeIn>
           </div>
         </div>
